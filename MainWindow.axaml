@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:TagAnalyzer.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="TagAnalyzer.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="标签分析工具 - jiashuai_xu@qq.com"
+        Width="900" Height="700"
+        MinWidth="600" MinHeight="400">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- 工具栏 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" Spacing="10">
+            <Button Name="SelectFileButton" Content="选择文件" 
+                    Click="SelectFileButton_Click"
+                    IsEnabled="{Binding !IsProcessing}"
+                    Classes="accent"/>
+            <Button Name="SelectFolderButton" Content="选择文件夹" 
+                    Click="SelectFolderButton_Click"
+                    IsEnabled="{Binding !IsProcessing}"
+                    Classes="accent"/>
+            <Button Name="ExportCsvButton" Content="导出CSV" 
+                    Click="ExportCsvButton_Click"
+                    Classes="outline"/>
+            <Button Name="ClearButton" Content="清空结果" 
+                    Click="ClearButton_Click"
+                    Classes="outline"/>
+        </StackPanel>
+
+        <!-- 主内容区域 -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- 状态信息 -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                <TextBlock Text="{Binding StatusMessage}" 
+                           FontSize="14" 
+                           Foreground="{DynamicResource SystemAccentColor}"/>
+                
+                <!-- 进度信息 -->
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" 
+                            IsVisible="{Binding TotalFiles}">
+                    <TextBlock Text="{Binding ProgressMessage}" 
+                               FontSize="12" 
+                               Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                    <TextBlock Text="{Binding CurrentProcessingFile, StringFormat=' | 当前: {0}'}" 
+                               FontSize="12" 
+                               Foreground="{DynamicResource SystemBaseMediumColor}"
+                               Margin="10,0,0,0"/>
+                </StackPanel>
+                
+                <!-- 进度条 -->
+                <ProgressBar Grid.Row="0" 
+                             Value="{Binding ProcessedFiles}" 
+                             Maximum="{Binding TotalFiles}"
+                             IsVisible="{Binding TotalFiles}"
+                             Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- 数据表格 -->
+            <ListBox Grid.Row="1" 
+                     ItemsSource="{Binding TagInfos}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Tag}" FontWeight="Bold"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Count}" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding SourceIds}" TextWrapping="Wrap" FontSize="11"/>
+                            <TextBlock Grid.Column="3" Text="{Binding SourceFiles}" TextWrapping="Wrap" FontSize="11" 
+                                       Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <!-- 底部状态栏 -->
+        <Border Grid.Row="2" Background="{DynamicResource SystemControlBackgroundBaseLowBrush}" 
+                Padding="10,5">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="作者：jiashuai_xu@qq.com" 
+                           FontSize="12" 
+                           Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                <TextBlock Text="|" 
+                           FontSize="12" 
+                           Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                <TextBlock Text="版本：1.0.0" 
+                           FontSize="12" 
+                           Foreground="{DynamicResource SystemBaseMediumColor}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    
+    <!-- C# 14 预览特性 -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <AnalysisLevel>latest</AnalysisLevel>
+    
+    <AssemblyTitle>Tag Analyzer</AssemblyTitle>
+    <AssemblyDescription>文本标签分析工具 - .NET 10 + C# 14</AssemblyDescription>
+    <AssemblyCompany>jiashuai_xu@qq.com</AssemblyCompany>
+    <AssemblyProduct>Tag Analyzer</AssemblyProduct>
+    <AssemblyCopyright>Copyright © jiashuai_xu@qq.com 2024</AssemblyCopyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.1.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.0" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+    
+    <!-- C# 14 增强库 -->
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+  </ItemGroup>
+
+</Project>
