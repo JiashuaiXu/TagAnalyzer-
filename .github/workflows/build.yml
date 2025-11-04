@@ -1,0 +1,335 @@
+name: Build and Test
+
+# This workflow builds and tests the Avalonia desktop application
+# built on .NET Core.
+#
+# To configure this workflow:
+#
+# 1. Configure environment variables
+# Replace the variables relative to your project in the "env" section below.
+#
+# 2. Signing (Optional)
+# If you want to sign your application, generate a signing certificate
+# and add it as a GitHub secret named "Base64_Encoded_Pfx".
+# Then uncomment the signing steps below.
+#
+# For more information on GitHub Actions, refer to https://github.com/features/actions
+# For a complete CI/CD sample for Avalonia applications,
+# refer to https://github.com/AvaloniaUI/Avalonia
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  PROJECT_NAME: TagAnalyzer
+  PROJECT_PATH: TagAnalyzer.csproj
+  DOTNET_VERSION: '10.0.x'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # Install the .NET Core SDK
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Restore dependencies
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    # Build the application
+    - name: Build the application
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ matrix.configuration }} --no-restore
+
+    # Execute unit tests (if test project exists)
+    - name: Execute unit tests
+      run: dotnet test
+      continue-on-error: true  # Continue if no test project exists
+
+    # Publish the application as single-file executable (Windows)
+    - name: Publish application (Windows x64)
+      run: |
+        dotnet publish ${{ env.PROJECT_PATH }} `
+          --configuration ${{ matrix.configuration }} `
+          --runtime win-x64 `
+          --self-contained true `
+          --output ./publish/win-x64-${{ matrix.configuration }} `
+          --property:PublishSingleFile=true `
+          --property:IncludeNativeLibrariesForSelfExtract=true `
+          --property:EnableCompressionInSingleFile=true `
+          --no-build
+
+    # Optional: Code signing (uncomment and configure if needed)
+    # - name: Decode the pfx
+    #   run: |
+    #     $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
+    #     $certificatePath = "GitHubActionsWorkflow.pfx"
+    #     [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+    #   if: matrix.configuration == 'Release'
+
+    # - name: Sign the executable
+    #   run: |
+    #     signtool sign /f GitHubActionsWorkflow.pfx /p "${{ secrets.Pfx_Key }}" /t http://timestamp.digicert.com /fd SHA256 ./publish/win-x64-${{ matrix.configuration }}/${{ env.PROJECT_NAME }}.exe
+    #   if: matrix.configuration == 'Release'
+
+    # - name: Remove the pfx
+    #   run: Remove-Item -Path GitHubActionsWorkflow.pfx
+    #   if: matrix.configuration == 'Release'
+
+    # Upload build artifacts
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}-${{ matrix.configuration }}-win-x64
+        path: ./publish/win-x64-${{ matrix.configuration }}/**/*
+        retention-days: 7
+
+  build-linux:
+    strategy:
+      matrix:
+        configuration: [Release]
+        runtime: [linux-x64, linux-arm64]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    - name: Build the application
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ matrix.configuration }} --no-restore
+
+    - name: Publish application (Linux)
+      run: |
+        dotnet publish ${{ env.PROJECT_PATH }} \
+          --configuration ${{ matrix.configuration }} \
+          --runtime ${{ matrix.runtime }} \
+          --self-contained true \
+          --output ./publish/${{ matrix.runtime }}-${{ matrix.configuration }} \
+          --property:PublishSingleFile=true \
+          --property:IncludeNativeLibrariesForSelfExtract=true \
+          --property:EnableCompressionInSingleFile=true \
+          --no-build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}-${{ matrix.configuration }}-${{ matrix.runtime }}
+        path: ./publish/${{ matrix.runtime }}-${{ matrix.configuration }}/**/*
+        retention-days: 7
+
+  build-macos:
+    strategy:
+      matrix:
+        configuration: [Release]
+        runtime: [osx-x64, osx-arm64]
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    - name: Build the application
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ matrix.configuration }} --no-restore
+
+    - name: Publish application (macOS)
+      run: |
+        dotnet publish ${{ env.PROJECT_PATH }} \
+          --configuration ${{ matrix.configuration }} \
+          --runtime ${{ matrix.runtime }} \
+          --self-contained true \
+          --output ./publish/${{ matrix.runtime }}-${{ matrix.configuration }} \
+          --property:PublishSingleFile=true \
+          --property:IncludeNativeLibrariesForSelfExtract=true \
+          --property:EnableCompressionInSingleFile=true \
+          --no-build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}-${{ matrix.configuration }}-${{ matrix.runtime }}
+        path: ./publish/${{ matrix.runtime }}-${{ matrix.configuration }}/**/*
+        retention-days: 7
+
+  # 自动发布到 GitHub Releases（仅限推送到 master 分支时）
+  publish-release:
+    needs: [build, build-linux, build-macos]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: windows-latest
+    permissions:
+      contents: write  # 需要写权限来创建 Release
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: 获取版本号
+      id: get_version
+      run: |
+        # 从项目文件中提取版本号
+        $csprojContent = Get-Content ${{ env.PROJECT_PATH }} -Raw
+        if ($csprojContent -match '<Version>([^<]+)</Version>') {
+          $version = $matches[1]
+        } elseif ($csprojContent -match '<AssemblyVersion>([^<]+)</AssemblyVersion>') {
+          $version = $matches[1]
+        } else {
+          # 使用日期作为版本号
+          $version = "dev-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "版本号: $version"
+
+    - name: 下载所有构建产物
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+
+    - name: 创建发布包
+      run: |
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        $artifactsDir = "./artifacts"
+        $packagesDir = "./packages"
+        New-Item -ItemType Directory -Path $packagesDir -Force | Out-Null
+        
+        Write-Host "正在创建发布包..." -ForegroundColor Green
+        
+        # Windows x64 Release
+        $winArtifact = Get-ChildItem -Path $artifactsDir -Filter "*-Release-win-x64" -Directory | Select-Object -First 1
+        if ($winArtifact) {
+          $exePath = Join-Path $winArtifact.FullName "TagAnalyzer.exe"
+          if (Test-Path $exePath) {
+            $zipPath = "$packagesDir/TagAnalyzer-v$version-win-x64.zip"
+            Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
+            Write-Host "已创建: $zipPath" -ForegroundColor Green
+          }
+        }
+        
+        # Linux x64
+        $linuxX64Artifact = Get-ChildItem -Path $artifactsDir -Filter "*-Release-linux-x64" -Directory | Select-Object -First 1
+        if ($linuxX64Artifact) {
+          $exePath = Join-Path $linuxX64Artifact.FullName "TagAnalyzer"
+          if (Test-Path $exePath) {
+            $zipPath = "$packagesDir/TagAnalyzer-v$version-linux-x64.zip"
+            Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
+            Write-Host "已创建: $zipPath" -ForegroundColor Green
+          }
+        }
+        
+        # Linux ARM64
+        $linuxArm64Artifact = Get-ChildItem -Path $artifactsDir -Filter "*-Release-linux-arm64" -Directory | Select-Object -First 1
+        if ($linuxArm64Artifact) {
+          $exePath = Join-Path $linuxArm64Artifact.FullName "TagAnalyzer"
+          if (Test-Path $exePath) {
+            $zipPath = "$packagesDir/TagAnalyzer-v$version-linux-arm64.zip"
+            Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
+            Write-Host "已创建: $zipPath" -ForegroundColor Green
+          }
+        }
+        
+        # macOS x64
+        $osxX64Artifact = Get-ChildItem -Path $artifactsDir -Filter "*-Release-osx-x64" -Directory | Select-Object -First 1
+        if ($osxX64Artifact) {
+          $exePath = Join-Path $osxX64Artifact.FullName "TagAnalyzer"
+          if (Test-Path $exePath) {
+            $zipPath = "$packagesDir/TagAnalyzer-v$version-macos-x64.zip"
+            Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
+            Write-Host "已创建: $zipPath" -ForegroundColor Green
+          }
+        }
+        
+        # macOS ARM64
+        $osxArm64Artifact = Get-ChildItem -Path $artifactsDir -Filter "*-Release-osx-arm64" -Directory | Select-Object -First 1
+        if ($osxArm64Artifact) {
+          $exePath = Join-Path $osxArm64Artifact.FullName "TagAnalyzer"
+          if (Test-Path $exePath) {
+            $zipPath = "$packagesDir/TagAnalyzer-v$version-macos-arm64.zip"
+            Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
+            Write-Host "已创建: $zipPath" -ForegroundColor Green
+          }
+        }
+        
+        Write-Host "所有发布包已创建完成" -ForegroundColor Green
+
+    - name: 创建 GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag: auto-build-${{ steps.get_version.outputs.VERSION }}
+        name: Auto Build v${{ steps.get_version.outputs.VERSION }}
+        body: |
+          ## 🚀 自动构建版本 v${{ steps.get_version.outputs.VERSION }}
+          
+          > 此版本由 GitHub Actions 自动构建并发布
+          > 
+          > 构建时间: ${{ github.event.head_commit.timestamp || github.run_started_at }}
+          > 提交: ${{ github.sha }}
+          
+          ### 📦 下载链接
+          
+          | 平台 | 架构 | 下载 |
+          |------|------|------|
+          | Windows | x64 | [TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-win-x64.zip](https://github.com/${{ github.repository }}/releases/download/auto-build-${{ steps.get_version.outputs.VERSION }}/TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-win-x64.zip) |
+          | Linux | x64 | [TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-linux-x64.zip](https://github.com/${{ github.repository }}/releases/download/auto-build-${{ steps.get_version.outputs.VERSION }}/TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-linux-x64.zip) |
+          | Linux | ARM64 | [TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-linux-arm64.zip](https://github.com/${{ github.repository }}/releases/download/auto-build-${{ steps.get_version.outputs.VERSION }}/TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-linux-arm64.zip) |
+          | macOS | x64 | [TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-macos-x64.zip](https://github.com/${{ github.repository }}/releases/download/auto-build-${{ steps.get_version.outputs.VERSION }}/TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-macos-x64.zip) |
+          | macOS | ARM64 | [TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-macos-arm64.zip](https://github.com/${{ github.repository }}/releases/download/auto-build-${{ steps.get_version.outputs.VERSION }}/TagAnalyzer-v${{ steps.get_version.outputs.VERSION }}-macos-arm64.zip) |
+          
+          ### 🚀 使用方法
+          
+          1. 下载对应平台的 ZIP 压缩包
+          2. 解压文件
+          3. 运行可执行文件（Windows: `TagAnalyzer.exe`，Linux/macOS: `TagAnalyzer`）
+          
+          ### ✨ 主要功能
+          
+          - 🎯 智能解析文本中的标签
+          - 📊 统计分析标签出现次数
+          - 📁 支持单文件和批量文件夹处理
+          - 📄 CSV 导出功能
+          - 🔢 支持所有 M 开头的数字编号格式（M24、M35、M1、M100 等）
+          - 📋 版本信息显示（关于窗口）
+          
+          ### 📋 系统要求
+          
+          - 无需安装 .NET Runtime（自包含发布）
+          - Windows 10/11, Linux, 或 macOS
+          
+          ---
+          
+          **注意**: 这是自动构建版本，如需正式发布版本，请使用 [release.yml](https://github.com/${{ github.repository }}/actions/workflows/release.yml) 工作流。
+          
+          **作者**: jiashuai_xu@qq.com
+        files: ./packages/*.zip
+        draft: false
+        prerelease: true  # 标记为预发布版本
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
