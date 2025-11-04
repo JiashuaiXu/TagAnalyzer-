@@ -19,7 +19,7 @@ bld/
 
 ## Visual Studio Code
 .vscode/
-
+.specstory/history/
 ## Rider
 .idea/
 
@@ -29,7 +29,7 @@ bld/
 *.user
 *.userosscache
 *.sln.docstates
-
+setup-github-token.ps1
 ## Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -48,7 +48,7 @@ bld/
 
 ## Visual Studio 2015/2017 cache/options directory
 .vs/
-
+.specstory/history/
 ## MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
@@ -93,3 +93,5 @@ test_folder/
 ehthumbs.db
 Thumbs.db
 Desktop.ini
+.specstory/history/
+setup-github-token.ps1
