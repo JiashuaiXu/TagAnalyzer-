@@ -147,6 +147,16 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// 获取应用程序版本号（使用 C# 原生反射）
+    /// </summary>
+    public string AppVersion => VersionInfo.ShortVersion;
+    
+    /// <summary>
+    /// 获取完整版本信息
+    /// </summary>
+    public string FullVersionInfo => VersionInfo.GetFullVersionInfo();
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

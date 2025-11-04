@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        x:Class="TagAnalyzer.AboutWindow"
+        Title="关于 - 标签分析工具"
+        Width="500" Height="400"
+        MinWidth="400" MinHeight="350"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题 -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="标签分析工具" 
+                       FontSize="24" 
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,10"/>
+            <TextBlock x:Name="VersionTextBlock"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource SystemAccentColor}"/>
+        </StackPanel>
+
+        <!-- 版本信息内容 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <TextBlock x:Name="VersionInfoTextBlock"
+                       FontSize="12"
+                       TextWrapping="Wrap"
+                       LineHeight="24"
+                       Margin="0,0,0,20"/>
+        </ScrollViewer>
+
+        <!-- 按钮 -->
+        <Button Grid.Row="2" 
+                Content="确定" 
+                HorizontalAlignment="Center"
+                Width="100"
+                Click="CloseButton_Click"
+                Classes="accent"/>
+    </Grid>
+</Window>
+

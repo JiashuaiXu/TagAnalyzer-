@@ -19,8 +19,10 @@
     <AssemblyCompany>jiashuai_xu@qq.com</AssemblyCompany>
     <AssemblyProduct>Tag Analyzer</AssemblyProduct>
     <AssemblyCopyright>Copyright © jiashuai_xu@qq.com 2024</AssemblyCopyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
+    <InformationalVersion>1.1.0</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>

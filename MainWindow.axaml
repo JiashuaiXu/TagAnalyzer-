@@ -31,6 +31,9 @@
             <Button Name="ClearButton" Content="清空结果" 
                     Click="ClearButton_Click"
                     Classes="outline"/>
+            <Button Name="AboutButton" Content="关于" 
+                    Click="AboutButton_Click"
+                    Classes="outline"/>
         </StackPanel>
 
         <!-- 主内容区域 -->
@@ -101,7 +104,7 @@
                 <TextBlock Text="|" 
                            FontSize="12" 
                            Foreground="{DynamicResource SystemBaseMediumColor}"/>
-                <TextBlock Text="版本：1.0.0" 
+                <TextBlock Text="{Binding AppVersion, StringFormat='版本：{0}'}" 
                            FontSize="12" 
                            Foreground="{DynamicResource SystemBaseMediumColor}"/>
             </StackPanel>

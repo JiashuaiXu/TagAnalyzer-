@@ -135,4 +135,10 @@ public partial class MainWindow : Window
     {
         _viewModel.ClearResults();
     }
+
+    private void AboutButton_Click(object? sender, RoutedEventArgs e)
+    {
+        var aboutWindow = new AboutWindow();
+        aboutWindow.ShowDialog(this);
+    }
 }
