@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TagAnalyzer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2a7d6079cee4a9631e4914184c9c2814373508cf")]
 [assembly: System.Reflection.AssemblyProductAttribute("TagAnalyzer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tag Analyzer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
