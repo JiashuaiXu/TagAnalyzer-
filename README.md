@@ -21,7 +21,15 @@
 
 ## 快速开始
 
-### 1. 编译运行
+### 1. 下载预编译版本（推荐）
+
+📦 **GitHub Releases**: 访问 [Releases 页面](https://github.com/JiashuaiXu/TagAnalyzer-/releases) 下载最新版本的预编译可执行文件。
+
+- 解压下载的 ZIP 文件
+- 双击 `TagAnalyzer.exe` 即可运行
+- 无需安装 .NET Runtime（自包含发布）
+
+### 2. 从源码编译运行
 
 ```bash
 # 克隆或下载项目
@@ -34,7 +42,7 @@ dotnet restore
 dotnet run
 ```
 
-### 2. 发布为可执行文件
+### 3. 手动发布为可执行文件
 
 ```powershell
 # Windows PowerShell

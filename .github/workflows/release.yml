@@ -1,0 +1,122 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 当推送以 v 开头的标签时触发（如 v1.1.0）
+  workflow_dispatch:  # 允许手动触发
+    inputs:
+      version:
+        description: '版本号 (例如: 1.1.0)'
+        required: true
+        type: string
+
+env:
+  PROJECT_NAME: TagAnalyzer
+  DOTNET_VERSION: '10.0.x'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置 .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: 还原依赖
+      run: dotnet restore
+      
+    - name: 构建项目
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: 发布为单文件（Windows x64）
+      run: |
+        dotnet publish --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output ./publish/win-x64 `
+          --property:PublishSingleFile=true `
+          --property:IncludeNativeLibrariesForSelfExtract=true `
+          --property:EnableCompressionInSingleFile=true `
+          --no-build
+      
+    - name: 获取版本号
+      id: get_version
+      run: |
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $version = "${{ inputs.version }}"
+        } else {
+          $tag = "${{ github.ref_name }}"
+          $version = $tag -replace '^v', ''
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "版本号: $version"
+        
+    - name: 创建发布包名称
+      id: package_name
+      run: |
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        $packageName = "${{ env.PROJECT_NAME }}-v$version-win-x64.zip"
+        echo "PACKAGE_NAME=$packageName" >> $env:GITHUB_OUTPUT
+        echo "包名称: $packageName"
+        
+    - name: 创建发布包
+      run: |
+        $packageName = "${{ steps.package_name.outputs.PACKAGE_NAME }}"
+        $archivePath = "./artifacts/$packageName"
+        New-Item -ItemType Directory -Path "./artifacts" -Force | Out-Null
+        Compress-Archive -Path "./publish/win-x64/TagAnalyzer.exe" -DestinationPath $archivePath -Force
+        echo "发布包已创建: $archivePath"
+        
+    - name: 上传发布包
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-package
+        path: artifacts/*.zip
+        retention-days: 30
+        
+    - name: 创建 GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag: v${{ steps.get_version.outputs.VERSION }}
+        files: artifacts/*.zip
+        name: Release v${{ steps.get_version.outputs.VERSION }}
+        body: |
+          ## 标签分析工具 v${{ steps.get_version.outputs.VERSION }}
+          
+          ### 📦 发布包
+          - **Windows x64**: `${{ steps.package_name.outputs.PACKAGE_NAME }}`
+          
+          ### 🚀 使用方法
+          1. 下载并解压 `${{ steps.package_name.outputs.PACKAGE_NAME }}`
+          2. 双击 `TagAnalyzer.exe` 运行程序
+          3. 点击"选择文件"按钮选择 .txt 文件进行分析
+          4. 点击"导出CSV"保存结果
+          
+          ### ✨ 主要功能
+          - 🎯 智能解析文本中的标签
+          - 📊 统计分析标签出现次数
+          - 📁 支持单文件和批量文件夹处理
+          - 📄 CSV 导出功能
+          - 🔢 支持所有 M 开头的数字编号格式（M24、M35、M1、M100 等）
+          - 📋 版本信息显示（关于窗口）
+          
+          ### 📋 系统要求
+          - Windows 10/11
+          - 无需安装 .NET Runtime（自包含发布）
+          
+          ### 📝 更新日志
+          查看 [README.md](https://github.com/${{ github.repository }}/blob/master/README.md#更新日志) 了解详细更新内容。
+          
+          ---
+          **作者**: jiashuai_xu@qq.com
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
