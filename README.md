@@ -1,200 +1,206 @@
-# 标签分析工具 (Tag Analyzer) - .NET 10 + C# 14
+# Tag Analyzer - .NET 10 + C# 14
 
-一个基于 .NET 10 和 Avalonia UI 的跨平台桌面应用程序，使用 C# 14 最新语法特性，用于分析文本文件中的标签信息。
+A cross-platform desktop application based on .NET 10 and Avalonia UI, using C# 14 latest syntax features, designed to analyze tag information in text files.
 
-## 功能特性
+[中文文档](README.zh-CN.md)
 
-- 🎯 **智能解析**：自动识别文本中的 `【标签】` 格式
-- 📊 **统计分析**：统计每个标签的出现次数和来源ID
-- 🖥️ **现代界面**：基于 Avalonia UI 的现代化图形界面
-- 📁 **文件选择**：支持通过对话框选择文本文件
-- 📄 **CSV导出**：支持将分析结果导出为CSV格式
-- 🔍 **ID追踪**：记录每个标签出现的具体ID位置
-- 🔢 **格式兼容**：支持所有 M 开头的数字编号格式（M24、M35、M1、M100 等）
-- 🌐 **跨平台**：支持 Windows、Linux、macOS
+## Features
 
-## 系统要求
+- 🎯 **Smart Parsing**: Automatically recognizes `【tag】` format in text
+- 📊 **Statistical Analysis**: Counts occurrences and source IDs for each tag
+- 🖥️ **Modern UI**: Modern graphical interface based on Avalonia UI
+- 📁 **File Selection**: Supports selecting text files through dialog
+- 📄 **CSV Export**: Supports exporting analysis results to CSV format
+- 🔍 **ID Tracking**: Records specific ID locations for each tag
+- 🔢 **Format Compatibility**: Supports all M-prefixed number formats (M24, M35, M1, M100, etc.)
+- 🌐 **Cross-platform**: Supports Windows, Linux, macOS
+- 📋 **Version Info**: Displays version information and About window
 
-- .NET 10.0 Runtime 或 SDK
-- Windows 10/11, Linux, 或 macOS
-- 支持 C# 14 语法特性
+## System Requirements
 
-## 快速开始
+- .NET 10.0 Runtime or SDK
+- Windows 10/11, Linux, or macOS
+- C# 14 syntax features support
 
-### 1. 下载预编译版本（推荐）
+## Quick Start
 
-📦 **GitHub Releases**: 访问 [Releases 页面](https://github.com/JiashuaiXu/TagAnalyzer-/releases) 下载最新版本的预编译可执行文件。
+### 1. Download Pre-built Version (Recommended)
 
-- 解压下载的 ZIP 文件
-- 双击 `TagAnalyzer.exe` 即可运行
-- 无需安装 .NET Runtime（自包含发布）
+📦 **GitHub Releases**: Visit the [Releases page](https://github.com/JiashuaiXu/TagAnalyzer-/releases) to download the latest pre-built executable.
 
-### 2. 从源码编译运行
+- Extract the downloaded ZIP file
+- Double-click `TagAnalyzer.exe` to run
+- No .NET Runtime installation required (self-contained release)
+
+### 2. Build from Source
 
 ```bash
-# 克隆或下载项目
-# 进入项目目录
+# Clone or download the project
+# Navigate to project directory
 
-# 还原依赖
+# Restore dependencies
 dotnet restore
 
-# 运行程序
+# Run the application
 dotnet run
 ```
 
-### 3. 手动发布为可执行文件
+### 3. Manual Publishing
 
 ```powershell
 # Windows PowerShell
 .\publish.ps1
 ```
 
-发布完成后，可执行文件位于 `./publish/TagAnalyzer.exe`
+After publishing, the executable will be located at `./publish/TagAnalyzer.exe`
 
-## 使用方法
+## Usage
 
-1. **启动程序**：双击 `TagAnalyzer.exe` 或运行 `dotnet run`
-2. **选择文件**：点击"选择文件"按钮，选择要分析的 `.txt` 文件
-3. **查看结果**：程序会自动解析并显示标签统计结果
-4. **导出数据**：点击"导出CSV"按钮保存结果到文件
-5. **清空结果**：点击"清空结果"按钮重新开始
+1. **Launch the application**: Double-click `TagAnalyzer.exe` or run `dotnet run`
+2. **Select file**: Click "Select File" button to choose a `.txt` file
+3. **View results**: The application will automatically parse and display tag statistics
+4. **Export data**: Click "Export CSV" button to save results to file
+5. **Clear results**: Click "Clear Results" button to start over
 
-## 支持的文本格式
+## Supported Text Format
 
-程序专门设计用于处理以下格式的文本文件：
+The application is specifically designed to process text files in the following format:
 
 ```
-M24_230001【抽泣】这是一些文本内容
-	拼音行（以制表符开头，会被忽略）
-M35_230002【叹气】【抽泣】另一行内容
-	更多拼音内容
-M100_230003【其他标签】第三行内容
+M24_230001【tag】Some text content
+	Phonetic line (starting with tab, will be ignored)
+M35_230002【sigh】【tag】Another line of content
+	More phonetic content
+M100_230003【other tag】Third line content
 ```
 
-### 解析规则
+### Parsing Rules
 
-- ✅ **ID行**：以 `M` 开头后跟数字编号和6位数字ID的行会被处理（如 `M24_230001`、`M35_230002`、`M100_230003` 等）
-- ❌ **拼音行**：以制表符开头的行会被忽略
-- 🏷️ **标签格式**：`【标签内容】` 格式的文本会被提取
-- 📝 **多标签**：同一行可以包含多个标签
-- 🔢 **编号格式**：支持所有 `M` + 数字编号 + `_` + 6位数字的格式（如 M1、M24、M35、M100 等）
+- ✅ **ID Line**: Lines starting with `M` followed by number and 6-digit ID will be processed (e.g., `M24_230001`, `M35_230002`, `M100_230003`)
+- ❌ **Phonetic Line**: Lines starting with tab will be ignored
+- 🏷️ **Tag Format**: Text in `【tag content】` format will be extracted
+- 📝 **Multiple Tags**: A single line can contain multiple tags
+- 🔢 **Number Format**: Supports all `M` + number + `_` + 6-digit format (e.g., M1, M24, M35, M100)
 
-## 输出格式
+## Output Format
 
-### 界面显示
-| 标签 | 出现次数 | 来源ID |
-|------|----------|--------|
-| 抽泣 | 2 | M24_230001, M35_230002 |
-| 叹气 | 1 | M35_230002 |
+### UI Display
+| Tag | Count | Source IDs |
+|------|-------|------------|
+| tag | 2 | M24_230001, M35_230002 |
+| sigh | 1 | M35_230002 |
 
-### CSV导出
+### CSV Export
 ```csv
-标签,出现次数,来源ID
-抽泣,2,"M24_230001, M35_230002"
-叹气,1,M35_230002
+Tag,Count,Source IDs
+tag,2,"M24_230001, M35_230002"
+sigh,1,M35_230002
 ```
 
-## 技术栈
+## Tech Stack
 
-- **框架**：.NET 10.0
-- **语言**：C# 14 (最新语法特性)
-- **UI框架**：Avalonia UI 11.1
-- **架构模式**：MVVM
-- **CSV处理**：CsvHelper
-- **正则表达式**：System.Text.RegularExpressions
+- **Framework**: .NET 10.0
+- **Language**: C# 14 (latest syntax features)
+- **UI Framework**: Avalonia UI 11.1
+- **Architecture**: MVVM
+- **CSV Processing**: CsvHelper
+- **Regular Expressions**: System.Text.RegularExpressions
 
-## 项目结构
+## Project Structure
 
 ```
 TagAnalyzer/
 ├── Models/
-│   └── TextParser.cs          # 文本解析逻辑
+│   ├── TextParser.cs          # Text parsing logic
+│   └── VersionInfo.cs         # Version information utility
 ├── ViewModels/
-│   └── MainWindowViewModel.cs  # 主窗口视图模型
-├── MainWindow.axaml           # 主窗口界面
-├── MainWindow.axaml.cs        # 主窗口代码后台
-├── App.axaml                  # 应用程序定义
-├── App.axaml.cs              # 应用程序代码后台
-├── Program.cs                # 程序入口点
-├── TagAnalyzer.csproj        # 项目文件
-├── publish.ps1              # 发布脚本
-└── README.md                # 说明文档
+│   └── MainWindowViewModel.cs  # Main window view model
+├── MainWindow.axaml           # Main window UI
+├── MainWindow.axaml.cs        # Main window code-behind
+├── AboutWindow.axaml          # About window UI
+├── AboutWindow.axaml.cs       # About window code-behind
+├── App.axaml                  # Application definition
+├── App.axaml.cs              # Application code-behind
+├── Program.cs                # Program entry point
+├── TagAnalyzer.csproj        # Project file
+├── publish.ps1              # Publish script
+└── README.md                # Documentation (English)
 ```
 
-## 开发信息
+## Development Info
 
-- **作者**：jiashuai_xu@qq.com
-- **版本**：1.0.0
-- **许可证**：MIT
-- **开发环境**：Visual Studio 2022 / VS Code
-- **目标框架**：.NET 10.0
-- **语言版本**：C# 14
+- **Author**: jiashuai_xu@qq.com
+- **Version**: 1.1.0
+- **License**: MIT
+- **Development Environment**: Visual Studio 2022 / VS Code
+- **Target Framework**: .NET 10.0
+- **Language Version**: C# 14
 
-## 常见问题
+## FAQ
 
-### Q: 程序无法启动？
-A: 请确保已安装 .NET 10.0 Runtime，或使用 `dotnet run` 命令运行。
+### Q: Application won't start?
+A: Make sure you have .NET 10.0 Runtime installed, or use `dotnet run` command.
 
-### Q: 无法选择文件？
-A: 请确保文件格式为 `.txt`，程序会自动过滤文件类型。
+### Q: Can't select files?
+A: Make sure the file format is `.txt`, the application will automatically filter file types.
 
-### Q: 解析结果不正确？
-A: 请检查文本格式是否符合要求，确保ID行以 `M` 开头后跟数字编号（如 `M24_`、`M35_`、`M100_` 等）。
+### Q: Parsing results incorrect?
+A: Please check if the text format meets requirements, ensure ID lines start with `M` followed by number (e.g., `M24_`, `M35_`, `M100_`).
 
-### Q: CSV导出失败？
-A: 请确保有足够的磁盘空间和文件写入权限。
+### Q: CSV export failed?
+A: Make sure you have sufficient disk space and file write permissions.
 
-## 自动构建和发布
+## Automated Build and Release
 
-项目使用 GitHub Actions 自动构建和发布。当您创建并推送版本标签时，会自动触发构建流程。
+The project uses GitHub Actions for automated building and releasing. When you create and push a version tag, the build process will be triggered automatically.
 
-### 创建发布版本
+### Creating Release Version
 
-**方法 1：通过标签触发（推荐）**
+**Method 1: Trigger via Tag (Recommended)**
 
 ```bash
-# 创建版本标签
+# Create version tag
 git tag v1.1.0
 
-# 推送标签到 GitHub
+# Push tag to GitHub
 git push origin v1.1.0
 ```
 
-推送标签后，GitHub Actions 会自动：
-1. 构建应用程序
-2. 打包为单文件可执行程序
-3. 创建 GitHub Release
-4. 上传发布包
+After pushing the tag, GitHub Actions will automatically:
+1. Build the application
+2. Package as single-file executable
+3. Create GitHub Release
+4. Upload release package
 
-**方法 2：手动触发**
+**Method 2: Manual Trigger**
 
-1. 访问 GitHub 仓库的 Actions 页面
-2. 选择 "Build and Release" workflow
-3. 点击 "Run workflow"
-4. 输入版本号（如：1.1.0）
-5. 点击 "Run workflow" 按钮
+1. Visit the GitHub repository's Actions page
+2. Select "Build and Release" workflow
+3. Click "Run workflow"
+4. Enter version number (e.g., 1.1.0)
+5. Click "Run workflow" button
 
-### 下载发布版本
+### Download Release Version
 
-访问 [GitHub Releases](https://github.com/JiashuaiXu/TagAnalyzer-/releases) 下载最新版本的预编译可执行文件。
+Visit [GitHub Releases](https://github.com/JiashuaiXu/TagAnalyzer-/releases) to download the latest pre-built executable.
 
-## 更新日志
+## Changelog
 
 ### v1.1.0 (2024-11-04)
-- 🔧 **格式支持扩展**：支持所有 M 开头的数字编号格式（M24、M35、M1、M100 等）
-- ✨ 统一处理 M 开头的编号格式，不再局限于 M35
-- 📝 更新解析规则，支持更灵活的文件格式
-- 📋 **版本控制**：添加版本信息显示和关于窗口
-- 🚀 **CI/CD**：添加 GitHub Actions 自动构建和发布流程
+- 🔧 **Format Support Extension**: Supports all M-prefixed number formats (M24, M35, M1, M100, etc.)
+- ✨ Unified processing of M-prefixed number formats, no longer limited to M35
+- 📝 Updated parsing rules to support more flexible file formats
+- 📋 **Version Control**: Added version information display and About window
+- 🚀 **CI/CD**: Added GitHub Actions automated build and release workflow
 
 ### v1.0.0 (2024-01-XX)
-- ✨ 初始版本发布
-- 🎯 支持标签解析和统计
-- 🖥️ 现代化GUI界面
-- 📄 CSV导出功能
-- 🌐 跨平台支持
-- 🚀 使用 .NET 10 + C# 14 最新特性
+- ✨ Initial release
+- 🎯 Tag parsing and statistics support
+- 🖥️ Modern GUI interface
+- 📄 CSV export functionality
+- 🌐 Cross-platform support
+- 🚀 Using .NET 10 + C# 14 latest features
 
 ---
 
-**联系方式**：jiashuai_xu@qq.com
+**Contact**: jiashuai_xu@qq.com

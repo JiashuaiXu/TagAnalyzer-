@@ -1,2 +1,0 @@
-C:\Users\Administrator\Desktop\New folder\publish\TagAnalyzer.pdb
-C:\Users\Administrator\Desktop\New folder\publish\TagAnalyzer.exe
