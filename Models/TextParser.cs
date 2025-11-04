@@ -14,7 +14,7 @@ public class TagInfo
 
 public class TextParser
 {
-    private static readonly Regex IdPattern = new(@"M35_\d{6}");
+    private static readonly Regex IdPattern = new(@"M\d+_\d{6}");
     private static readonly Regex TagPattern = new(@"【([^】]+)】");
 
     public static List<TagInfo> ParseText(string text)
